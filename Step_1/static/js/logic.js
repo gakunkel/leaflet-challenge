@@ -122,7 +122,7 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
 
     legend.addTo(map)
 
-    d3.json("../PB2002_boundaries.json", function(plateData) {
+    d3.json("PB2002_boundaries.json", function(plateData) {
         L.geoJSON(plateData, {
             color: "#ff6500",
             weight: 2
