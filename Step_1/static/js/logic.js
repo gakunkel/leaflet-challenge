@@ -42,17 +42,17 @@ let overlays = {
     "Tectonic Plates": tectonicplates, 
     "Earthquakes": allEarthquakes, 
 }
-L.control.layers(baseMaps. overlays).addTo(map)
+L.control.layers(baseMaps, overlays).addTo(map);
 
-d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(function(data) {
+d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson", function(data) {
     function styleInfo(feature){
         return{
-            opacity: 1, 
-            fillOpacity: 1, 
-            fillColor: getColor(feature.properties.mag), 
+            opacity: 1,
+            fillOpacity: 1,
+            fillColor: getColor(feature.properties.mag),
             color: "#00000",
             radius: getRadius(feature.properties.mag),
-            stroke: true, 
+            stroke: true,
             weight: 0.5,
         }
     }
@@ -91,8 +91,44 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
         },
         style: styleInfo,
         onEachFeature: function(feature, layer) {
-            layer.bindPopup("Magnitude:" + feature.properties.mag + "<br>Location:" + feature.properties.place);
+            layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location:" + feature.properties.place);
         }
     }).addTo(allEarthquakes)
     allEarthquakes.addTo(map)
-});
+
+
+    let legend = L.control({
+        position: "bottomright"
+    })
+
+    legend.onAdd = function(){
+        let div = L.DomUtil.create('div', 'info legend');
+        const magnitudes = [0,1,2,3,4,5]
+        const colors = [
+            "#98eee0",
+            "#d4ee00",
+            "#eecc00",
+            "#ee9c00",
+            "#ea822c",
+            "#ea2c2c"
+    ]
+
+        for(var i = 0; i < magnitudes.length; i++) {
+            console.log(colors[i])
+            div.innerHTML += `<i style='background:${colors[i]}'></i>` + magnitudes[i] + (magnitudes[i + 1] ? "&ndash;" + magnitudes[i + 1] + "<br>": "+")
+        }
+        return div;
+    }
+
+    legend.addTo(map)
+
+    d3.json("../PB2002_boundaries.json", function(plateData) {
+        L.geoJSON(plateData, {
+            color: "#ff6500",
+            weight: 2
+        }).addTo(tectonicplates)
+
+        tectonicplates.addTo(map)
+    })
+})
+
